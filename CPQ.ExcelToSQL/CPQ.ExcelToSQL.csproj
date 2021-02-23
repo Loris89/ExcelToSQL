@@ -10,11 +10,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="SQL\final_query.sql" />
     <None Remove="SQL\temp_sp.sql" />
     <None Remove="SQL\update-checklist-sp.sql" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="SQL\final_query.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\temp_sp.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
