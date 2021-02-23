@@ -10,12 +10,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="SQL\alter_1.sql" />
+    <None Remove="SQL\alter_2.sql" />
     <None Remove="SQL\final_query.sql" />
     <None Remove="SQL\temp_sp.sql" />
     <None Remove="SQL\update-checklist-sp.sql" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="SQL\alter_1.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\alter_2.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\final_query.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
