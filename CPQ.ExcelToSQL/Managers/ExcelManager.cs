@@ -40,6 +40,8 @@ namespace CPQ.ExcelToSQL.Managers
             // -- Aggiunta colonna e suo popolamento
             // -- Modifica stored procedures
             // -- Statements generati da questo tool
+            // 5) Alter_1.sql e Alter_2.sql sono gli script per aggiornare le stored procedures. 
+            //    Purtroppo però dobbiamo inglobarli nello scriptone finale.
 
             // Mi sono concentrato su 3 aspetti:
             // 1- Passaggio delle tuple idDoc,Mandatory,Sostituto in input alla stored
@@ -59,7 +61,7 @@ namespace CPQ.ExcelToSQL.Managers
             // - Esecuzione di questo tool
             // Così facendo non sporchiamo i veri ambienti con la nostra stored procedure
 
-            // Test SQL connection
+            // Test SQL connection --> riportare nel punto corretto del codice
             using (var conn = new SqlConnection(@"data source=localhost\SQLEXPRESS;initial catalog=DBFEUNICO;Integrated Security=SSPI;"))
             using (var command = new SqlCommand("test", conn) {  CommandType = CommandType.StoredProcedure })
             {
@@ -215,6 +217,65 @@ namespace CPQ.ExcelToSQL.Managers
                 // Se tutto il documento excel è valido eseguo l'import
                 if (!messages.Any())
                 {
+                    using (var conn = new SqlConnection(@"data source=localhost\SQLEXPRESS;initial catalog=DBFEUNICO;Integrated Security=SSPI;"))
+                    {
+                        conn.Open();
+
+                        foreach (var filter in listDocAcquisitionFilter)
+                        {
+                            // TODO: Inserire nome corretto stored procedure
+                            using var command = new SqlCommand("test", conn) { CommandType = CommandType.StoredProcedure };
+
+                            #region Passaggio dei parametri alla SP
+
+                            var docs = filter.MappingDocs.Select(m => $"{m.DocumentId},{m.Mandatory},{m.SubstituteId}").ToList();
+
+                            var table = new DataTable();
+                            table.Columns.Add("IdDoc", typeof(string));
+                            table.Columns.Add("Mandatory", typeof(bool));
+                            table.Columns.Add("SubstituteId", typeof(string));
+
+                            foreach (string s in docs)
+                            {
+                                string[] parts = s.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                                DataRow row = table.NewRow();
+                                row[0] = parts[0];
+                                row[1] = parts[1] == "O";
+                                if (parts.Length == 3)
+                                    row[2] = parts[2];
+
+                                table.Rows.Add(row);
+                            }
+
+                            var docsParameter = new SqlParameter("@docs", SqlDbType.Structured)
+                            {
+                                TypeName = "dbo.Docs",
+                                Value = table
+                            };
+
+                            command.Parameters.Add(docsParameter);
+                            // Altri parametri
+                            command.Parameters.AddWithValue("@ciae", filter.CIAE);
+                            command.Parameters.AddWithValue("@sae", filter.SAE);
+                            command.Parameters.AddWithValue("@legalNature", filter.COD_AUC); // TODO
+                            command.Parameters.AddWithValue("@rowNum", null);                // TODO
+                            command.Parameters.AddWithValue("@idDocList", filter.ID_DOC_LIST);
+
+                            #endregion
+
+                            // esecuzione stored procedure e scrittura su file
+                            using SqlDataReader rdr = command.ExecuteReader();
+                            // itera il risultato e scrivi su file
+                            while (rdr.Read())
+                            {
+                                // Stampa di prova per testare il passaggio di parametri complessi.
+                                // Da sostituire con la stampa singola di ogni query generata dalla sp (SELECT * FROM #tmp_result come ultimo statement nella stored)
+                                // Esempio: File.AppendAllText(@"query.sql", $"{rdr["query"]}{Environment.NewLine}");
+                                File.AppendAllText(@"query.sql", $"{rdr["IdDoc"]},{rdr["Mandatory"]},{rdr["SubstituteId"]}{Environment.NewLine}");
+                            }
+                        }
+                    }
+
                     //loop create new users
                     //foreach (var user in listUsers)
                     //{
