@@ -36,6 +36,10 @@ namespace CPQ.ExcelToSQL.Managers
             // 1) In questo progetto ho creato una cartella SQL in cui inseriremo gli script
             // 2) Il codice che vedi sotto l'ho fatto per testare la connessione a SQL Express locale
             // 3) In "temp_sp.sql" trovi una bozza di stored procedure in cui ho fatto degli esperimenti da cui puoi riprendere le attività.
+            // 4) In "final_query.sql" ci sarà tutto il necessario da rilasciare al cliente:
+            // -- Aggiunta colonna e suo popolamento
+            // -- Modifica stored procedures
+            // -- Statements generati da questo tool
 
             // Mi sono concentrato su 3 aspetti:
             // 1- Passaggio delle tuple idDoc,Mandatory,Sostituto in input alla stored

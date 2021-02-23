@@ -17,6 +17,8 @@ END
 
 -- AGGIORNAMENTO STORED PROCEDURES
 
+-- Penso tocchi wrappare le operazioni "alter" delle stored procedure in degli exec qui dentro
+
 -- INSERIRE QUI GLI SCRIPT SQL GENERATI DAL TOOL
 
 COMMIT TRANSACTION
